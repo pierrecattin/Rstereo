@@ -1,10 +1,10 @@
 #' autostereogram
 #'
-#' @param depth.map Depth map representing the 3D shape. Possible values are:  \n  Numeric matrix. Elements with large value appear closer. \n Character containing path to greyscale .bmp (24bits) picture. The whiter a pixel is, the closer it appears.
-#' @param pattern Optional. Path to a picture representing the pattern used to create the autostereogram. If not provided, a random dot autostereogram is generated.
-#' @param repetitions Numeric. Number of times the pattern should be repeated horizontally.
+#' @param depth.map Depth map representing the 3D shape. Possible values are:  a) Numeric matrix where lements with large value appear closer. b) Character containing path to greyscale .bmp .jpg or .png picture. The whiter a pixel is, the closer it appears.
+#' @param pattern Optional. Path to a picture (.bmp .jpg or .png) representing the pattern used to create the autostereogram. If not provided, a random dot autostereogram is generated.
+#' @param repetitions Optional. Number of times the pattern should be repeated horizontally. Default is round(width(depth.map)/100)
 #'
-#' @return array representing image
+#' @return cimg image
 #' @export
 #'
 autostereogram <- function (depth.map, pattern, repetitions) {
@@ -66,7 +66,7 @@ autostereogram <- function (depth.map, pattern, repetitions) {
   # Import/generate pattern ####
   if (!missing(pattern)){
     pattern <- load.image(pattern)
-    pattern <- resimape(pattern, round(E/2), round(height(pattern)*E/(2*width(pattern))))
+    pattern <- resize(pattern, round(E/2), round(height(pattern)*E/(2*width(pattern))))
   } else {  # generate random pattern
     pattern <- array(data=NA, dim=c(nrow=map.height, ncol=E/2, 1, 4))
     pattern[,,1,] <- round(runif(E/2*map.height)) # random black and white pixels
@@ -93,7 +93,7 @@ autostereogram <- function (depth.map, pattern, repetitions) {
       if(sum(x.left.all==x.image, na.rm = T) > 0 | sum(x.right.all==x.image, na.rm = T) > 0){ # Dans le domaine avec les 2 yeux
         pattern.y <- (i - 1) %% pattern.map.height + 1
         pattern.x <- (x.first - 1) %% pattern.map.width + 1
-        col <- pattern[pattern.x, pattern.y,1, ] # Trouve les valeurs RGB du pixel du pattern correspondant ? la position actuelle
+        col <- pattern[pattern.x, pattern.y,1, ] # Trouve les valeurs RGB du pixel du pattern correspondant a la position actuelle
 
         while(!is.na(x.image)){ # Dans le domaine avec les 2 yeux
 
@@ -108,5 +108,12 @@ autostereogram <- function (depth.map, pattern, repetitions) {
       }
     }
   }
-  return(image)
+  # rotate image
+  image <- aperm(image, perm=c(2,1,3))
+
+  # convert to cimg
+  cimage <- array(NA, dim=c(dim(image)[1:2], 1, dim(image)[3]))
+  cimage[,,1,] <- image
+  cimage <- cimg(cimage)
+  return(cimage)
 }

@@ -7,10 +7,10 @@
 import.map(path)
 }
 \arguments{
-\item{path}{Character indicating path to depth map (BW picture)}
+\item{path}{Character indicating path to depth map (greyscale picture)}
 }
 \value{
-matrix where elements are in [0,1]. White pixel become 1, and black 0.
+Matrix where elements are in [0,1]. White pixel become 1, and black 0.
 }
 \description{
 import.map
