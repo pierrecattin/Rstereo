@@ -14,9 +14,9 @@ import.map <- function(path){
   # check if dimension 3 (color) is not constant
   layers.1.2.equal <- (sum(map[,,1] != map[,,2]) == 0)
   layers.1.3.equal <- (sum(map[,,1] != map[,,3]) == 0)
-  if (!(layers.1.2.equal & layers.1.3.equal)){
-    stop("Depth map picture cannot have colors.")
-  }
+  # if (!(layers.1.2.equal & layers.1.3.equal)){
+  #   stop("Depth map picture cannot have colors.")
+  # }
   map <- map[,,1] # remove color dimension (constant)
   map <- map/max(map) # normalize to [0,1]
   map <- t(map)
