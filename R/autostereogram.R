@@ -8,7 +8,7 @@
 #' @export
 #'
 autostereogram <- function (depth.map, pattern, repetitions) {
-
+  library(imager)
   # Define constants  ####
   u <- 1/3 # Ratio depth of 3d object / depth of space
   D <- 30 # depth of space
