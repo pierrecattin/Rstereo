@@ -1,10 +1,9 @@
-#' import.map
+#' Internal function. Import a greyscale picture and convert it in a matrix. Supported picture formats are PNG, JPEG and BMP.
 #'
 #' @param path Character indicating path to depth map (greyscale picture)
 #'
 #' @return Matrix where elements are in [0,1]. White pixel become 1, and black 0.
 #'
-#' @export
 #'
 #' @importFrom imager load.image
 #'

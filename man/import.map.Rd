@@ -2,7 +2,7 @@
 % Please edit documentation in R/import.map.R
 \name{import.map}
 \alias{import.map}
-\title{import.map}
+\title{Internal function. Import a greyscale picture and convert it in a matrix. Supported picture formats are PNG, JPEG and BMP.}
 \usage{
 import.map(path)
 }
@@ -13,5 +13,5 @@ import.map(path)
 Matrix where elements are in [0,1]. White pixel become 1, and black 0.
 }
 \description{
-import.map
+Internal function. Import a greyscale picture and convert it in a matrix. Supported picture formats are PNG, JPEG and BMP.
 }

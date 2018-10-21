@@ -2,7 +2,7 @@
 % Please edit documentation in R/autostereogram.R
 \name{autostereogram}
 \alias{autostereogram}
-\title{autostereogram}
+\title{Creates autostereogram based on a depth map and a pattern. If no pattern is provided, a random-dot autostereogram is created. The object returned is a cimg from the image package. Supported picture formats are PNG, JPEG and BMP.}
 \usage{
 autostereogram(depth.map, pattern, repetitions)
 }
@@ -17,7 +17,7 @@ autostereogram(depth.map, pattern, repetitions)
 cimg image
 }
 \description{
-autostereogram
+Creates autostereogram based on a depth map and a pattern. If no pattern is provided, a random-dot autostereogram is created. The object returned is a cimg from the image package. Supported picture formats are PNG, JPEG and BMP.
 }
 \examples{
 # Plot bivariate gaussian distribution
@@ -25,7 +25,7 @@ x <- seq(-2.5, 2.5, 0.02)
 y <- seq(-2.5, 2.5, 0.05)
 depth.map <- matrix(data=NA, nrow=length(x), ncol=length(y))
 for(i in 1:length(x)) {
-  for(j in 1:length(y)) {
+  for(j in 1:length(y)) {?
     depth.map[i,j] <-  (1/(2*pi)) * exp( -((x[i])^2 + (y[j])^2)/2 )
   }
 }
