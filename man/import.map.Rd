@@ -11,6 +11,8 @@ import.map(path)
 }
 \value{
 Matrix where elements are in [0,1]. White pixel become 1, and black 0.
+
+ @export
 }
 \description{
 import.map

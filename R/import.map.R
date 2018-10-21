@@ -3,7 +3,10 @@
 #' @param path Character indicating path to depth map (greyscale picture)
 #'
 #' @return Matrix where elements are in [0,1]. White pixel become 1, and black 0.
-#' @export
+#'
+#'  @export
+#'
+#' @importFrom imager load.image
 #'
 import.map <- function(path){
   cimg <- load.image(path) # import picture

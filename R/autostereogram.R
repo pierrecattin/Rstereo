@@ -6,6 +6,12 @@
 #'
 #' @return cimg image
 #' @export
+#' @importFrom imager load.image
+#' @importFrom imager resize
+#' @importFrom imager cimg
+#' @importFrom imager height
+#' @importFrom imager width
+#' @importFrom stats runif
 #'
 autostereogram <- function (depth.map, pattern, repetitions) {
   # Define constants  ####
