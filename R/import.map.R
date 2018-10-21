@@ -4,7 +4,6 @@
 #'
 #' @return Matrix where elements are in [0,1]. White pixel become 1, and black 0.
 #'
-#'  @export
 #'
 #' @importFrom imager load.image
 #'

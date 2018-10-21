@@ -19,3 +19,16 @@ cimg image
 \description{
 autostereogram
 }
+\examples{
+# Plot bivariate gaussian distribution
+x <- seq(-2.5, 2.5, 0.02)
+y <- seq(-2.5, 2.5, 0.05)
+depth.map <- matrix(data=NA, nrow=length(x), ncol=length(y))
+for(i in 1:length(x)) {
+  for(j in 1:length(y)) {
+    depth.map[i,j] <-  (1/(2*pi)) * exp( -((x[i])^2 + (y[j])^2)/2 )
+  }
+}
+gaussian <- autostereogram(depth.map)
+plot(gaussian, axes=FALSE)
+}

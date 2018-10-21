@@ -3,3 +3,5 @@ test_data
 test_cases.R
 Rstereo.Rproj
 LICENSE
+^.*\.Rproj$
+^\.Rproj\.user$
