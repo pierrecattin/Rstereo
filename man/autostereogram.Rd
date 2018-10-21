@@ -7,9 +7,9 @@
 autostereogram(depth.map, pattern, repetitions)
 }
 \arguments{
-\item{depth.map}{Depth map representing the 3D shape. Possible values are:  a) Numeric matrix where lements with large value appear closer. b) Character containing path to greyscale .bmp (24bits) picture. The whiter a pixel is, the closer it appears.}
+\item{depth.map}{Depth map representing the 3D shape. Possible values are:  a) Numeric matrix where lements with large value appear closer. b) Character containing path to greyscale .bmp .jpg or .png picture. The whiter a pixel is, the closer it appears.}
 
-\item{pattern}{Optional. Path to a picture representing the pattern used to create the autostereogram. If not provided, a random dot autostereogram is generated.}
+\item{pattern}{Optional. Path to a picture (.bmp .jpg or .png) representing the pattern used to create the autostereogram. If not provided, a random dot autostereogram is generated.}
 
 \item{repetitions}{Optional. Number of times the pattern should be repeated horizontally. Default is round(width(depth.map)/100)}
 }

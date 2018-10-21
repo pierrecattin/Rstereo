@@ -8,7 +8,6 @@
 #' @export
 #'
 autostereogram <- function (depth.map, pattern, repetitions) {
-  library(imager)
   # Define constants  ####
   u <- 1/3 # Ratio depth of 3d object / depth of space
   D <- 30 # depth of space
@@ -45,7 +44,7 @@ autostereogram <- function (depth.map, pattern, repetitions) {
   d <- round(s(0)) # width to add on image's sides
   C <- d + 2*map.width
   D <- 2*d + 2*map.width
-  map.redim <- matrix(nrow = map.height, ncol = 2*map.width+2*d) # Nouvelle matrice redimensionnée
+  map.redim <- matrix(nrow = map.height, ncol = 2*map.width+2*d) # Resized new matrix
 
   map.redim[, 1:(d-1)] <- 0
 
@@ -81,29 +80,29 @@ autostereogram <- function (depth.map, pattern, repetitions) {
   image <- array(data=NA, dim=c(map.height, map.width, dim.pixel))
 
   for(i in 1:map.height){ # Scan each line
-    x.far <- 1:map.width # Valeurs de X sur le plan lointain
-    map.line <- map[i,]# Extrait les valeurs de map sur cette ligne
-    x.left.all <- round(project.l(x.far, map.line)) # Calcule les valeurs de X correspontants aux map pour l'oeil gauche
-    x.right.all <-round(project.r(x.far, map.line)) # Calcule les valeurs de X correspontants aux map pour l'oeil droit
+    x.far <- 1:map.width # X values in remote plane
+    map.line <- map[i,] # Extract map values of current line
+    x.left.all <- round(project.l(x.far, map.line)) # Compute X values corresponding to map for left eye
+    x.right.all <-round(project.r(x.far, map.line)) # Compute X values corresponding to map for right eye
 
-    while(sum(is.na(image[i,,1])) > 0){ # Tourne tant que des pixels ne sont pas définis
-      x.first <- which(is.na(image[i,,1]))[1] # Trouve le premier pixel non-défini
+    while(sum(is.na(image[i,,1])) > 0){ # Continues as long as there are NA pixel values
+      x.first <- which(is.na(image[i,,1]))[1] # Find first undefined pixel
       x.image <- x.first
 
-      if(sum(x.left.all==x.image, na.rm = T) > 0 | sum(x.right.all==x.image, na.rm = T) > 0){ # Dans le domaine avec les 2 yeux
+      if(sum(x.left.all==x.image, na.rm = T) > 0 | sum(x.right.all==x.image, na.rm = T) > 0){ # Check that both eyes are in image domain
         pattern.y <- (i - 1) %% pattern.map.height + 1
         pattern.x <- (x.first - 1) %% pattern.map.width + 1
-        col <- pattern[pattern.x, pattern.y,1, ] # Trouve les valeurs RGB du pixel du pattern correspondant a la position actuelle
+        col <- pattern[pattern.x, pattern.y,1, ] # Find RGB values of pattern's pixel corresponding to current position
 
-        while(!is.na(x.image)){ # Dans le domaine avec les 2 yeux
+        while(!is.na(x.image)){  # Check that both eyes are in image domain
 
           image[i, x.image, ] <- col
           x.right <- x.image + round(s(map.line[which(x.left.all == x.image)[1]]))
-          if(!is.na(x.right)) image[i, x.right, ] <- col # Teste si le pixel est encore dans le domaine
+          if(!is.na(x.right)) image[i, x.right, ] <- col # Check if pixel is still in domain
 
-          x.image <- x.right # On décale au pixel suivant
+          x.image <- x.right # Switch to next pixel
         }
-      }else{ # Au moins un des yeux est dehors du domaine
+      }else{ # At least one eye is outside of domain
         image[i, x.image, ] <- rep(0, dim.pixel)
       }
     }

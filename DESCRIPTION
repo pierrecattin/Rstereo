@@ -1,12 +1,12 @@
 Package: Rstereo
 Type: Package
 Title: Rstereo
+Description: R package to create autostereograms based on a given pattern or random dots. The input depth map can be a matrix or a black and white picture.
+Maintainer: Pierre Cattin <cattin.pierre@gmail.com>
 Version: 0.1.0
 Imports: imager
-Author: Pierre Cattin
-Maintainer: Pierre Cattin <cattin.pierre@gmail.com>
-Description: R package to create autostereograms
-License: GNU GPL 3.0
+Author: Pierre Cattin, Jean Cattin
+License: GPL (>= 2)
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.0.1

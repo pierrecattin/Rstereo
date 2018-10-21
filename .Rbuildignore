@@ -1,2 +1,5 @@
-^.*\.Rproj$
-^\.Rproj\.user$
+img
+test_data
+test_cases.R
+Rstereo.Rproj
+LICENSE
