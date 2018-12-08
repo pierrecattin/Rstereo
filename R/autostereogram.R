@@ -29,7 +29,8 @@
 autostereogram <- function (depth.map, pattern, repetitions) {
   # Define constants  ####
   profile.depth <- 1/3 # Ratio depth of 3d object / depth of space
-  img.back.dist <- 30 # depth of space
+  #img.back.dist <- 1 # depth of space
+  eye.back.dist <- 2 # y-distance between eyes and back plane
 
   # Create Depth Map ####
   if (typeof(depth.map) == "character"){
@@ -47,53 +48,62 @@ autostereogram <- function (depth.map, pattern, repetitions) {
   }
   map.width <- ncol(map)
   map.height <- nrow(map)
+  intereye.dist <- map.width/4 # distance between two eyes, in pixels
 
   if(missing(repetitions)){
-    repetitions <- round(map.width/100)
+    repetitions <- max(round(map.width/100),2)
   }
 
-  E <- round(map.width/repetitions*4)
+  #E <- round(map.width/repetitions*4)
 
-  # Define functions to compute the x value of a point projected on the image plane for right and left eye
-  project.r <- function(x, z) x - (x - (E + map.width)/2)*(img.back.dist - z*profile.depth*img.back.dist)/(2*img.back.dist - z*profile.depth*img.back.dist)
-  project.l <- function(x, z) x - (x - (map.width-E)/2) * (img.back.dist-z*profile.depth*img.back.dist)/(2*img.back.dist - z*profile.depth*img.back.dist)
-  s <- function(z) E*(1-z*profile.depth)/(2-z*profile.depth)
+  # Define function to compute the x value of a point projected on the image plane for left and right eye
+  project.on.image <- function(x, z){ # x: x-position on depth map; z: depth value
+    x.image.left <- x - abs(x-(map.width-intereye.dist)/2) * (1-z)/(eye.back.dist-z) # x value on image plane for left eye
+    x.image.right <- x - abs(x-(map.width+intereye.dist)/2) * (1-z)/(eye.back.dist-z) # x value on image plane for right eye
+    return(c(left=x.image.left, right=x.image.right))
+  }
+
+  # project.r <- function(x, z) x - (x - (E + map.width)/2)*(img.back.dist - z*profile.depth*img.back.dist)/(2*img.back.dist - z*profile.depth*img.back.dist)
+  #project.l <- function(x, z) x - (x - (map.width-E)/2) * (img.back.dist-z*profile.depth*img.back.dist)/(2*img.back.dist - z*profile.depth*img.back.dist)
+  # s <- function(z) E*(1-z*profile.depth)/(2-z*profile.depth) # ???
 
   # Expand depth.map
-  d <- round(s(0)) # width to add on image's sides
-  C <- d + 2*map.width
-  img.back.dist <- 2*d + 2*map.width
-  map.redim <- matrix(nrow = map.height, ncol = 2*map.width+2*d) # Resized new matrix
+  # d <- round(s(0)) # width to add on image's sides
+  # C <- d + 2*map.width
+  # img.back.dist <- 2*d + 2*map.width
+  # map.redim <- matrix(nrow = map.height, ncol = 2*map.width+2*d) # Resized new matrix
 
-  map.redim[, 1:(d-1)] <- 0
-
-  for(i in d:(C-1) ){
-    j <- round(((i-d+1)+0.1)/2)
-    map.redim[,i] <- map[,j]
-  }
-
-  map.redim[, C:(img.back.dist-1)] <- 0
-
-  map <- map.redim
+  # map.redim[, 1:(d-1)] <- 0
+  #
+  # for(i in d:(C-1) ){
+  #   j <- round(((i-d+1)+0.1)/2)
+  #   map.redim[,i] <- map[,j]
+  # }
+  #
+  # map.redim[, C:(img.back.dist-1)] <- 0
+  #
+  # map <- map.redim
 
   # update dimensions
-  map.width <- ncol(map)
-  map.height <- nrow(map)
+  # map.width <- ncol(map)
+  # map.height <- nrow(map)
 
 
   # Import/generate pattern ####
+  pattern.width <- round(map.width/repetitions) # find width of pattern so that there is the right number of repetition
   if (!missing(pattern)){
     pattern <- load.image(pattern)
-    pattern <- resize(pattern, round(E/2), round(height(pattern)*E/(2*width(pattern))))
+    pattern <- resize(pattern,
+                      pattern.width, # set width
+                      round(height(pattern)*pattern.width/width(pattern))) # scale height to preserve pattern proportions
   } else {  # generate random pattern
-    pattern <- array(data=NA, dim=c(nrow=map.height, ncol=E/2, 1, 4))
-    pattern[,,1,] <- round(runif(E/2*map.height)) # random black and white pixels
+    pattern <- array(data=NA, dim=c(nrow=map.height, ncol=pattern.width, 1, 4))
+    pattern[,,1,] <- round(runif(pattern.width*map.height)) # random black and white pixels
     pattern[,,1,4] <- 1
   }
 
   dim.pixel <- length(pattern[1,1,1,])
-  pattern.map.width <- length(pattern[,1,1,1])
-  pattern.map.height <- length(pattern[1, ,1,1])
+  pattern.height <- length(pattern[1,,1,1])
 
   # array that will store final image
   image <- array(data=NA, dim=c(map.height, map.width, dim.pixel))
@@ -109,8 +119,8 @@ autostereogram <- function (depth.map, pattern, repetitions) {
       x.image <- x.first
 
       if(sum(x.left.all==x.image, na.rm = T) > 0 | sum(x.right.all==x.image, na.rm = T) > 0){ # Check that both eyes are in image domain
-        pattern.y <- (i - 1) %% pattern.map.height + 1
-        pattern.x <- (x.first - 1) %% pattern.map.width + 1
+        pattern.y <- (i - 1) %% pattern.height + 1
+        pattern.x <- (x.first - 1) %% pattern.width + 1
         col <- pattern[pattern.x, pattern.y,1, ] # Find RGB values of pattern's pixel corresponding to current position
 
         while(!is.na(x.image)){  # Check that both eyes are in image domain
