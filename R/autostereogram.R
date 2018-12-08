@@ -28,8 +28,8 @@
 
 autostereogram <- function (depth.map, pattern, repetitions) {
   # Define constants  ####
-  u <- 1/3 # Ratio depth of 3d object / depth of space
-  D <- 30 # depth of space
+  profile.depth <- 1/3 # Ratio depth of 3d object / depth of space
+  img.back.dist <- 30 # depth of space
 
   # Create Depth Map ####
   if (typeof(depth.map) == "character"){
@@ -38,10 +38,10 @@ autostereogram <- function (depth.map, pattern, repetitions) {
     if(typeof(depth.map) != "double"){
       stop("If depth.map is a matrix, its type should be 'double'")
     }
-    map <- depth.map
+    map.raw <- depth.map
     # normalize to [0,1]
-    map <- map - min(map)
-    map <- map / max(map)
+    map.raw <- map.raw - min(map.raw)
+    map <- map.raw / max(map.raw)
     } else {
     stop("depth.map should be a character or a matrix")
   }
@@ -55,14 +55,14 @@ autostereogram <- function (depth.map, pattern, repetitions) {
   E <- round(map.width/repetitions*4)
 
   # Define functions to compute the x value of a point projected on the image plane for right and left eye
-  project.r <- function(x, z) x - (x - (E + map.width)/2)*(D - z*u*D)/(2*D - z*u*D)
-  project.l <- function(x, z) x - (x - (map.width-E)/2) * (D-z*u*D)/(2*D - z*u*D)
-  s <- function(z) E*(1-z*u)/(2-z*u)
+  project.r <- function(x, z) x - (x - (E + map.width)/2)*(img.back.dist - z*profile.depth*img.back.dist)/(2*img.back.dist - z*profile.depth*img.back.dist)
+  project.l <- function(x, z) x - (x - (map.width-E)/2) * (img.back.dist-z*profile.depth*img.back.dist)/(2*img.back.dist - z*profile.depth*img.back.dist)
+  s <- function(z) E*(1-z*profile.depth)/(2-z*profile.depth)
 
   # Expand depth.map
   d <- round(s(0)) # width to add on image's sides
   C <- d + 2*map.width
-  D <- 2*d + 2*map.width
+  img.back.dist <- 2*d + 2*map.width
   map.redim <- matrix(nrow = map.height, ncol = 2*map.width+2*d) # Resized new matrix
 
   map.redim[, 1:(d-1)] <- 0
@@ -72,7 +72,7 @@ autostereogram <- function (depth.map, pattern, repetitions) {
     map.redim[,i] <- map[,j]
   }
 
-  map.redim[, C:(D-1)] <- 0
+  map.redim[, C:(img.back.dist-1)] <- 0
 
   map <- map.redim
 
