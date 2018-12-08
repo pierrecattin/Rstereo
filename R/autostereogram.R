@@ -53,7 +53,7 @@ autostereogram <- function (depth.map, pattern, repetitions) {
   }
 
   E <- round(map.width/repetitions*4)
-
+ 
   # Define functions to compute the x value of a point projected on the image plane for right and left eye
   project.r <- function(x, z) x - (x - (E + map.width)/2)*(D - z*u*D)/(2*D - z*u*D)
   project.l <- function(x, z) x - (x - (map.width-E)/2) * (D-z*u*D)/(2*D - z*u*D)
