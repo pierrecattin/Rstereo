@@ -57,15 +57,14 @@ autostereogram <- function (depth.map, pattern, repetitions) {
   #E <- round(map.width/repetitions*4)
 
   # Define function to compute the x value of a point projected on the image plane for left and right eye
-  project.on.image <- function(x, z){ # x: x-position on depth map; z: depth value
-    x.image.left <- x - abs(x-(map.width-intereye.dist)/2) * (1-z)/(eye.back.dist-z) # x value on image plane for left eye
-    x.image.right <- x - abs(x-(map.width+intereye.dist)/2) * (1-z)/(eye.back.dist-z) # x value on image plane for right eye
-    return(c(left=x.image.left, right=x.image.right))
+  project.on.image <- function(x, z, eye){ # x: x-position on depth map; z: depth value
+    x.image <- switch(eye,
+                           "left" = x - (x-(map.width-intereye.dist)/2) * (1-z)/(eye.back.dist-z), # x value on image plane for left eye
+                           "right" =  x - (x-(map.width+intereye.dist)/2) * (1-z)/(eye.back.dist-z)) # x value on image plane for right eye
+    return(x.image)
   }
 
-  # project.r <- function(x, z) x - (x - (E + map.width)/2)*(img.back.dist - z*profile.depth*img.back.dist)/(2*img.back.dist - z*profile.depth*img.back.dist)
-  #project.l <- function(x, z) x - (x - (map.width-E)/2) * (img.back.dist-z*profile.depth*img.back.dist)/(2*img.back.dist - z*profile.depth*img.back.dist)
-  # s <- function(z) E*(1-z*profile.depth)/(2-z*profile.depth) # ???
+  s <- function(z) intereye.dist*(1-z*profile.depth)/(2-z*profile.depth) # ???
 
   # Expand depth.map
   # d <- round(s(0)) # width to add on image's sides
@@ -103,24 +102,26 @@ autostereogram <- function (depth.map, pattern, repetitions) {
   }
 
   dim.pixel <- length(pattern[1,1,1,])
-  pattern.height <- length(pattern[1,,1,1])
+  pattern.height <- length(pattern[,1,1,1])
 
   # array that will store final image
   image <- array(data=NA, dim=c(map.height, map.width, dim.pixel))
 
   for(i in 1:map.height){ # Scan each line
-    x.far <- 1:map.width # X values in remote plane
+    x.back <- 1:map.width # X values in remote plane
     map.line <- map[i,] # Extract map values of current line
-    x.left.all <- round(project.l(x.far, map.line)) # Compute X values corresponding to map for left eye
-    x.right.all <-round(project.r(x.far, map.line)) # Compute X values corresponding to map for right eye
+
+
+    x.left.all <- round(project.on.image(x.back, map.line, "left")) # Compute X values on image corresponding to map for left eye
+    x.right.all <- round(project.on.image(x.back, map.line, "right")) # Compute X values on image  corresponding to map for right eye
 
     while(sum(is.na(image[i,,1])) > 0){ # Continues as long as there are NA pixel values
-      x.first <- which(is.na(image[i,,1]))[1] # Find first undefined pixel
-      x.image <- x.first
+      x.fill <- which(is.na(image[i,,1]))[1] # Find first undefined pixel
+      x.image <- x.fill
 
       if(sum(x.left.all==x.image, na.rm = T) > 0 | sum(x.right.all==x.image, na.rm = T) > 0){ # Check that both eyes are in image domain
         pattern.y <- (i - 1) %% pattern.height + 1
-        pattern.x <- (x.first - 1) %% pattern.width + 1
+        pattern.x <- (x.fill - 1) %% pattern.width + 1
         col <- pattern[pattern.x, pattern.y,1, ] # Find RGB values of pattern's pixel corresponding to current position
 
         while(!is.na(x.image)){  # Check that both eyes are in image domain
